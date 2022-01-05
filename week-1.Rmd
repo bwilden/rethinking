@@ -7,6 +7,7 @@ output: html_document
 
 ```{r, message=FALSE}
 library(tidyverse)
+library(rethinking)
 ```
 
 
@@ -25,5 +26,38 @@ tibble(posterior = posterior,
        p_grid = p_grid) %>% 
   ggplot(aes(x = p_grid, y = posterior)) +
   geom_point()
+```
+
+# 2
+
+```{r}
+n <- 1e4
+p_grid <- seq(from = 0, to = 1, length.out = n)
+prior2 <- ifelse(p_grid < .5, 0, 1)
+likelihood2 <- dbinom(4, 6, prob = p_grid)
+
+posterior2 <- likelihood2 * prior2
+posterior2 <- posterior2 / sum(posterior2)
+
+p <- tibble(posterior = posterior2, 
+       p_grid = p_grid) %>% 
+  ggplot(aes(x = p_grid, y = posterior)) +
+  geom_point()
+p
+```
+
+# 3
+
+```{r}
+samples <- sample(p_grid ,prob = posterior2, size = n, replace = TRUE)
+
+perc_89 <- PI(samples, prob = .89)
+hpdi_89 <- HPDI(samples, prob = .89)
+
+p +
+  geom_vline(xintercept = perc_89[1], color = "red") +
+  geom_vline(xintercept = perc_89[2], color = "red") +
+  geom_vline(xintercept = hpdi_89[1], color = "blue") +
+  geom_vline(xintercept = hpdi_89[2], color = "blue")
 ```
 
