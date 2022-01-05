@@ -1,0 +1,29 @@
+---
+title: "Week 1"
+author: "Bertrand Wilden"
+date: "1/5/2022"
+output: html_document
+---
+
+```{r, message=FALSE}
+library(tidyverse)
+```
+
+
+# 1
+
+```{r}
+n <- 1e4
+p_grid <- seq(from = 0, to = 1, length.out = n)
+prior <- rep(1, n)
+likelihood <- dbinom(4, 15, prob = p_grid)
+
+posterior <- likelihood * prior
+posterior <- posterior / sum(posterior)
+
+tibble(posterior = posterior, 
+       p_grid = p_grid) %>% 
+  ggplot(aes(x = p_grid, y = posterior)) +
+  geom_point()
+```
+
